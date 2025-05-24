@@ -1,7 +1,9 @@
-import { useSelector, useDispatch } from "react-redux";
-import { DashboardRootState, DashboardDispatch } from "../store";
-import { updateWorkStatus } from "../store/userSlice";
+import { Radio, RadioGroup } from "@headlessui/react";
+import { CheckIcon } from "@heroicons/react/20/solid";
+import { useDispatch, useSelector } from "react-redux";
 import { WorkStatus } from "../../shared/types";
+import { DashboardDispatch, DashboardRootState } from "../store";
+import { updateWorkStatus } from "../store/userSlice";
 
 export const WorkStatusCard = ({ className = "" }: { className?: string }) => {
   const { profile } = useSelector((state: DashboardRootState) => state.user);
@@ -13,30 +15,49 @@ export const WorkStatusCard = ({ className = "" }: { className?: string }) => {
     not_looking: "Don't want to hear about work",
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(updateWorkStatus(e.target.value as WorkStatus));
+  const selectOptions: { id: WorkStatus; name: string }[] = [
+    { id: "looking", name: statusLabels["looking"] },
+    { id: "passive", name: statusLabels["passive"] },
+    { id: "not_looking", name: statusLabels["not_looking"] },
+  ];
+
+  const dispatchWorkStatusEvent = (status: WorkStatus) => {
+    const event = new CustomEvent("work-status-change", {
+      detail: { workStatus: status },
+    });
+    window.dispatchEvent(event);
+  };
+
+  const handleStatusChange = (status: WorkStatus) => {
+    dispatch(updateWorkStatus(status));
+    dispatchWorkStatusEvent(status);
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-6 h-full ${className}`}>
+    <div className={`bg-white rounded-lg p-6 h-full ${className}`}>
       <h3 className="text-lg font-medium mb-4 pb-3 border-b border-gray-200">
         Your Work Status
       </h3>
-      <div className="py-2">
-        <p>Update your availability for new opportunities:</p>
-        <select
+      <div>
+        <RadioGroup
           value={profile.workStatus}
           onChange={handleStatusChange}
-          className="w-full p-3 border border-gray-200 rounded-md my-4 text-base"
+          aria-label="Select your current work status"
+          className="space-y-2"
         >
-          <option value="looking">Currently looking for work</option>
-          <option value="passive">Passively looking for work</option>
-          <option value="not_looking">Don't want to hear about work</option>
-        </select>
-        <p className="mt-4 text-gray-500">
-          Your current status:{" "}
-          <strong>{statusLabels[profile.workStatus]}</strong>
-        </p>
+          {selectOptions.map((option) => (
+            <Radio
+              key={option.id}
+              value={option.id}
+              className="group relative flex cursor-pointer rounded-lg px-5 py-4 transition bg-gray-100 focus:not-data-focus:outline-none data-checked:bg-blue-50 data-focus:outline data-focus:outline-blue-500 data-hover:bg-gray-200 data-hover:data-checked:bg-blue-100"
+            >
+              <div className="flex w-full items-center justify-between">
+                <p>{option.name}</p>
+                <CheckIcon className="size-6 fill-blue-500 opacity-0 transition group-data-checked:opacity-100" />
+              </div>
+            </Radio>
+          ))}
+        </RadioGroup>
       </div>
     </div>
   );

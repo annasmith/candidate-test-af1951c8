@@ -57,7 +57,7 @@ export const RecentJobs = ({ className = "" }: { className?: string }) => {
             </li>
           ))}
         </ul>
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white border-none py-3 rounded mt-4 text-sm cursor-pointer transition-colors">
+        <button className="w-full bg-gray-900 hover:bg-gray-700 text-white border-none py-3 rounded mt-4 text-sm cursor-pointer transition-colors">
           View All Jobs
         </button>
       </div>
